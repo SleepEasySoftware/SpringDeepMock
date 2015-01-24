@@ -39,6 +39,17 @@ public class MockDatabaseTest {
     }
 
     @Test
+    /**
+     This test proves that we can still get the real Database class if we want to.
+
+     This test shows another tricky detail.  beans.xml is component-scan for the com.sleepeasysoftware package
+     and this test is in that package.  Unfortunately, this means when this test is on the classpath (because you decide to run it)
+     then the component-scan will find the above @Configuration and use it.  This prevents us from getting the real Database in another
+     test even if we want to for a good reason (e.g., an end to end test).
+
+     Here's how we solve this problem: We create a blank interface named NoAutowire and we make Config implement it.  Then, we configure
+     the beans.xml component-scan and tell it to ignore any class that implements this interface.
+     */
     public void testCanGetRealDatabaseInOtherTests() throws Exception {
         ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
         Database realRepo = context.getBean(Database.class);
